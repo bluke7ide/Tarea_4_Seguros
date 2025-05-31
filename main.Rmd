@@ -1,0 +1,23 @@
+---
+title: "main"
+output: html_document
+---
+
+```{r}
+source("cod/setup.R")
+```
+
+```{r}
+c_compuesta <- function(f){
+  
+}
+
+s_compuesta <- function(f){
+  
+}
+
+r_compuesta <- function(densidad, f){
+  
+}
+```
+
