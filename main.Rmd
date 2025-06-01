@@ -8,10 +8,58 @@ source("cod/setup.R")
 ```
 
 ```{r}
-c_compuesta <- function(f){
-  
+#' Realiza la convolución de dos arreglos/funciones
+#' @param arr1 - arreglo num 1 a convolucionar
+#' @param arr2 - arreglo num 2 a convolucionar - no importa el orden
+convolucion <- function(arr1, arr2){
+  # hay que guardar los tamaños de los arreglos porque se modifican in-place
+  l1 <- length(arr1)
+  l2 <- length(arr2)
+  arr1 <- c(arr1, rep(0, l2))
+  arr2 <- c(arr2, rep(0, l1)) #                    | 
+  # y con un sapply gracias a que R entiende eso   v
+  return(sapply(1:(l1+l2-1), function(x) sum(arr1[x:1]*arr2[1:x])))
 }
+```
 
+
+```{r}
+#' Realiza la compuesta Poisson  
+#' @param lambda - parámetro de la compuesta Poisson
+#' @param montos - arreglo de los reclamos individuales
+#' @param probs - arreglo de las probabilidades de los reclamos 
+c_compuesta <- function(lambda, montos, probs, dens){
+  if(sum(montos%%1!=0) != 0){
+    stop("Los montos deben ser enteros")
+  }
+  n <- sum(montos)+1
+  mat_conv <- array(0, dim = c(n, n))
+  pois <- sapply(0:n, function(x) dpois(x, lambda))
+  mat_conv[1,1] <- 1
+  mat_conv[2:(length(montos)+1),2] <- probs
+  ant <- probs
+  for(i in 3:n){
+    ant <- convolucion(ant, probs)
+    t <- min(n, i+length(ant))
+    mat_conv[i:t,i] <- ant[1:(t-i+1)]
+  }
+  return(mat_conv %*% dens)
+}
+```
+
+```{r}
+dens <- c(0.449329,0.359463,0.143785,0.038343,0.007669,0.001227,0.000164)
+c_compuesta(0.8, c(1,2,3), c(0.25,0.375,0.375), dens)
+```
+
+```{r}
+dens <- sapply(0:6, function(x) dpois(x, lambda = 0.8))
+c_compuesta(0.8, c(1,2,3), c(0.25,0.375,0.375), dens)
+```
+
+
+
+```{r}
 s_compuesta <- function(f){
   
 }
