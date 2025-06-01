@@ -1,6 +1,15 @@
 ---
-title: "main"
-output: html_document
+title: "Tarea 4 - Seguros de No Vida I"
+author: 
+  - Estudiantes
+  - Luis Fernando Amey Apuy - C20470
+  - Javier Hernández Navarro - C13674
+
+date: "`r Sys.Date()`"
+output:
+  rmdformats::robobook:
+    self_contained: true
+    highlight: tango
 ---
 # Librerías
 ```{r}
@@ -54,7 +63,7 @@ c_compuesta(0.8, 6, c(0.25,0.375,0.375))
 ## Ejercicio 4
 ```{r}
 probs <- c(0.1,0.2,0.3,0.4)
-c_compuesta(2, 0:4, probs)
+c_compuesta(2, 4, probs)
 ```
 
 ## Función bajo el método simplificado
