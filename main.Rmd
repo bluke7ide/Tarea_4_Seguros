@@ -2,11 +2,13 @@
 title: "main"
 output: html_document
 ---
-
+# Librerías
 ```{r}
 source("cod/setup.R")
 ```
 
+# Pregunta 1
+## Función convolución
 ```{r}
 #' Realiza la convolución de dos arreglos/funciones
 #' @param arr1 - arreglo num 1 a convolucionar
@@ -22,19 +24,16 @@ convolucion <- function(arr1, arr2){
 }
 ```
 
-
+## Función bajo el método clásico
 ```{r}
-#' Realiza la compuesta Poisson  
+#' Realiza la compuesta Poisson mediante el método clásico
 #' @param lambda - parámetro de la compuesta Poisson
-#' @param montos - arreglo de los reclamos individuales
+#' @param max - número máximo de x a evaluar
 #' @param probs - arreglo de las probabilidades de los reclamos 
-c_compuesta <- function(lambda, valores, probs){
-  if(sum(valores%%1!=0) != 0){
-    stop("Los valores deben ser enteros")
-  }
-  n <- length(valores)
+c_compuesta <- function(lambda, max, probs){
+  n <- max + 1
   mat_conv <- array(0, dim = c(n, n))
-  pois <- dpois(valores, lambda)
+  pois <- dpois(0:max, lambda)
   mat_conv[1,1] <- 1
   mat_conv[2:(length(probs)+1),2] <- probs
   ant <- probs
@@ -47,17 +46,23 @@ c_compuesta <- function(lambda, valores, probs){
 }
 ```
 
+### Comprobación bajo el ejemplo de la diapositiva
 ```{r}
-c_compuesta(0.8, 0:6, c(0.25,0.375,0.375))
+c_compuesta(0.8, 6, c(0.25,0.375,0.375))
 ```
 
+## Ejercicio 4
 ```{r}
 probs <- c(0.1,0.2,0.3,0.4)
 c_compuesta(2, 0:4, probs)
 ```
 
-
+## Función bajo el método simplificado
 ```{r}
+#' Realiza la compuesta Poisson mediante el método simplificado
+#' @param lambda - parámetro de la compuesta Poisson
+#' @param montos - arreglo de los reclamos individuales
+#' @param probs - arreglo de las probabilidades de los reclamos 
 s_compuesta <- function(lambda, montos, probs){
   if(sum(montos%%1!=0) != 0){
     stop("Los montos deben ser enteros")
@@ -65,7 +70,8 @@ s_compuesta <- function(lambda, montos, probs){
   n <- sum(montos)
   pois <- probs*lambda
   for(i in 1:length(montos)){
-    valores <- seq(0,n - n%%i, i) # tomar los valores enteros
+    # hay que tomar los valores enteros para las distribuciones poisson
+    valores <- seq(0,n - n%%i, i) 
     res <- rep(0, n+1)
     res[valores+1] <- dpois(0:(length(valores)-1), pois[i])
     if(i == 1){
@@ -78,13 +84,19 @@ s_compuesta <- function(lambda, montos, probs){
 }
 ```
 
+### Comprobación bajo el ejemplo de la diapositiva
 ```{r}
 s_compuesta(0.8, c(1,2,3), c(0.25,0.375,0.375))
 ```
 
-
-
+# Pregunta 2
+## Función bajo el método recursivo
 ```{r}
+#' Realiza la compuesta mediante el método recursivo
+#' @param densidad - densidad de la compuesta. "Poisson", "Binomial" y "Binomial Negativa"
+#' @param params - parámetros de la densidad. Si son dos poner en un arreglo
+#' @param max - número máximo de x a evaluar
+#' @param probs - arreglo de las probabilidades de los reclamos 
 r_compuesta <- function(densidad, params, max, probs){
   fns <- rep(0, max+1)
   if(densidad == "Poisson"){
@@ -114,6 +126,8 @@ r_compuesta <- function(densidad, params, max, probs){
   } else {
     stop("La densidad indicada no es ni la Poisson, Binomial ni Binomial Negativa")
   }
+  
+  # Inicia el proceso recursivo
   for(i in 1:max){
     conv <- rep(0, i)
     conv[1:min(i,length(probs))] <- probs[1:min(i,length(probs))] 
@@ -125,6 +139,7 @@ r_compuesta <- function(densidad, params, max, probs){
 }
 ```
 
+### Comprobación bajo el ejemplo de la diapositiva
 ```{r}
 r_compuesta("Poisson", 0.8, 6, c(0.25,0.375,0.375))
 ```
