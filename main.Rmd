@@ -155,8 +155,9 @@ r_compuesta <- function(densidad, params, max, probs) {
       stop("La cantidad de parámetros para la Binomial Negativa son 2, r y beta")
     }
     a <- params[2] / (1 + params[2])
-    b <- (params[1] - 1) * params[2] / (1 + params[2])
-    fns[1] <- (1 + params[2]) ^ (-params[1])
+    beta <- (1-params[2])/params[2]
+    b <- (params[1] - 1) * beta / (1 + beta)
+    fns[1] <- (1 + beta) ^ (-params[1])
   } else {
     stop("La densidad indicada no es ni la Poisson, Binomial ni Binomial Negativa")
   }
@@ -183,13 +184,10 @@ ejemplo == round(r_compuesta("Poisson", 0.8, 6, c(0.25, 0.375, 0.375)), 6)
 ## Ejercicio 11
 ```{r}
 probs <- c(0.7, 0.3)
-p <- 0.5
-beta <- (1 - p) / p
-
 res <- data.frame(t(
   data.frame(
     Poisson = r_compuesta("Poisson", 4.5, 5, probs),
-    Binomial_Negativa = r_compuesta("Binomial Negativa", c(4.5, beta), 5, probs),
+    Binomial_Negativa = r_compuesta("Binomial Negativa", c(4.5, 0.5), 5, probs),
     Binomial = r_compuesta("Binomial", c(9, 0.5), 5, probs)
   )
 ))
